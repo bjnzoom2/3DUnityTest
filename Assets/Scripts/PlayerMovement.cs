@@ -7,7 +7,10 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector2 movementInput;
     private Vector3 movementVector;
-    private float playerSpeed = 6.5f;
+
+    private float playerSpeed = 0.0f;
+    private float sprintSpeed = 9.5f;
+    private float baseSpeed = 6.5f;
 
     private Vector2 mouseLookDelta;
     private Vector3 mouseLookVelocity;
@@ -19,6 +22,11 @@ public class PlayerMovement : MonoBehaviour
     private bool isGrounded = false;
 
     private float jumpPower = 8.0f;
+
+    private bool variantActivated = false;
+
+    private float baseFOV = 80.0f;
+    private float sprintFOV = 110.0f;
 
     private void Awake()
     {
@@ -35,11 +43,14 @@ public class PlayerMovement : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        playerSpeed = baseSpeed;
     }
 
     private void Update()
     {
         isGrounded = controller.isGrounded;
+        variantActivated = inputs.Player.Variant.IsPressed();
 
         mouseLookDelta = inputs.Player.MouseLook.ReadValue<Vector2>();
         mouseLookVelocity = new Vector3(-mouseLookDelta.y, mouseLookDelta.x, 0.0f) * sensitivity;
@@ -48,6 +59,18 @@ public class PlayerMovement : MonoBehaviour
         mouseLookEuler.x = Mathf.Clamp(mouseLookEuler.x, -89.0f, 89.0f);
 
         movementInput = inputs.Player.GroundMovement.ReadValue<Vector2>();
+
+        if (variantActivated && movementInput.magnitude != 0.0f)
+        {
+            Camera.main.fieldOfView = sprintFOV;
+            playerSpeed = sprintSpeed;
+        }
+        else
+        {
+            Camera.main.fieldOfView = baseFOV;
+            playerSpeed = baseSpeed;
+        }
+
         movementVector = Quaternion.Euler(new Vector3(0.0f, mouseLookEuler.y, 0.0f)) * new Vector3(movementInput.x, 0.0f, movementInput.y) * playerSpeed;
 
         if (inputs.Player.Jump.WasPressedThisFrame())
