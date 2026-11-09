@@ -27,6 +27,8 @@ public class PlayerMovement : MonoBehaviour
 
     private float baseFOV = 80.0f;
     private float sprintFOV = 110.0f;
+    private float targetFOV = 80.0f;
+    private float FOVChangeVelocity = 0.0f;
 
     private void Awake()
     {
@@ -45,6 +47,7 @@ public class PlayerMovement : MonoBehaviour
         Cursor.visible = false;
 
         playerSpeed = baseSpeed;
+        Camera.main.fieldOfView = baseFOV;
     }
 
     private void Update()
@@ -62,12 +65,12 @@ public class PlayerMovement : MonoBehaviour
 
         if (variantActivated && movementInput.magnitude != 0.0f)
         {
-            Camera.main.fieldOfView = sprintFOV;
+            targetFOV = sprintFOV;
             playerSpeed = sprintSpeed;
         }
         else
         {
-            Camera.main.fieldOfView = baseFOV;
+            targetFOV = baseFOV;
             playerSpeed = baseSpeed;
         }
 
@@ -93,5 +96,6 @@ public class PlayerMovement : MonoBehaviour
         controller.Move((movementVector + Vector3.up * yVelocity) * Time.deltaTime);
         transform.eulerAngles = new Vector3(0.0f, mouseLookEuler.y, 0.0f);
         Camera.main.transform.eulerAngles = new Vector3(mouseLookEuler.x, mouseLookEuler.y, 0.0f);
+        Camera.main.fieldOfView = Mathf.SmoothDamp(Camera.main.fieldOfView, targetFOV, ref FOVChangeVelocity, 0.15f);
     }
 }
