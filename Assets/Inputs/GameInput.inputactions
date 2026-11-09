@@ -37,9 +37,19 @@
                     "priority": 0
                 },
                 {
-                    "name": "Variant",
+                    "name": "Sprint",
                     "type": "Button",
                     "id": "28f4dfd2-21e5-45aa-ad8b-2a5b2685e49d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
+                    "name": "Crouch",
+                    "type": "Button",
+                    "id": "fac21813-0c24-4653-a540-7e61fa7e7e18",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -104,39 +114,6 @@
                     "isPartOfComposite": true
                 },
                 {
-                    "name": "One Modifier",
-                    "id": "b8bd7427-501c-4e37-962d-236bfc7089d1",
-                    "path": "OneModifier",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "GroundMovement",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "modifier",
-                    "id": "2439a9d0-fe15-4adf-bd16-67c210c3a638",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "GroundMovement",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "binding",
-                    "id": "ed5e45d0-fdbc-4938-af2b-7332afcd91b0",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "GroundMovement",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
                     "name": "",
                     "id": "bf3dafc8-6d7b-42cc-97ea-4d5e551ff1a5",
                     "path": "<Mouse>/delta",
@@ -165,7 +142,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Variant",
+                    "action": "Sprint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a20e576e-485f-4079-b9fc-530155619d75",
+                    "path": "<Keyboard>/leftCtrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Crouch",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
