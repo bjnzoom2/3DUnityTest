@@ -14,10 +14,11 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 mouseLookEuler;
     private float sensitivity = 70.0f;
 
-    private float gravity = 10.0f;
+    private float gravity = 14.0f;
     private float yVelocity = 0.0f;
-
     private bool isGrounded = false;
+
+    private float jumpPower = 8.0f;
 
     private void Awake()
     {
@@ -40,14 +41,6 @@ public class PlayerMovement : MonoBehaviour
     {
         isGrounded = controller.isGrounded;
 
-        if (isGrounded && yVelocity <= 0.0f)
-        {
-            yVelocity = 0.0f;
-        } else
-        {
-            yVelocity -= gravity * Time.deltaTime;
-        }
-
         mouseLookDelta = inputs.Player.MouseLook.ReadValue<Vector2>();
         mouseLookVelocity = new Vector3(-mouseLookDelta.y, mouseLookDelta.x, 0.0f) * sensitivity;
         mouseLookEuler += mouseLookVelocity * Time.deltaTime;
@@ -56,6 +49,23 @@ public class PlayerMovement : MonoBehaviour
 
         movementInput = inputs.Player.GroundMovement.ReadValue<Vector2>();
         movementVector = Quaternion.Euler(new Vector3(0.0f, mouseLookEuler.y, 0.0f)) * new Vector3(movementInput.x, 0.0f, movementInput.y) * playerSpeed;
+
+        if (inputs.Player.Jump.WasPressedThisFrame())
+        {
+            if (isGrounded)
+            {
+                yVelocity = jumpPower;
+            }
+        }
+
+        if (isGrounded && yVelocity <= 0.0f)
+        {
+            yVelocity = -1.0f;
+        }
+        else
+        {
+            yVelocity -= gravity * Time.deltaTime;
+        }
 
         controller.Move((movementVector + Vector3.up * yVelocity) * Time.deltaTime);
         transform.eulerAngles = new Vector3(0.0f, mouseLookEuler.y, 0.0f);
