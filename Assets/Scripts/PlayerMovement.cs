@@ -27,7 +27,7 @@ public class PlayerMovement : MonoBehaviour
     private float playerSpeed = 0.0f;
     private float sprintSpeed = 7.5f;
     private float baseSpeed = 4.0f;
-    private float crouchSpeed = 2.0f;
+    private float crouchSpeed = 1.75f;
 
     private Vector2 mouseLookDelta;
     private Vector3 mouseLookVelocity;
@@ -53,7 +53,9 @@ public class PlayerMovement : MonoBehaviour
     private float headBobTimer = 0.0f;
     private float headBobMagnitude = 0.05f;
     private float headBobRate = 2.5f;
-    private Vector3 headBobOffset = new();
+    private Vector3 currentHeadBobOffset = new();
+    private Vector3 targetHeadBobOffset = new();
+    private Vector3 headBobChangeVelo = new();
 
     private void Awake()
     {
@@ -150,8 +152,8 @@ public class PlayerMovement : MonoBehaviour
             headBobTimer = 0.0f;
         }
 
-        headBobOffset.x = Mathf.Sin(headBobTimer / 2.0f) * headBobMagnitude;
-        headBobOffset.y = Mathf.Sin(headBobTimer) * headBobMagnitude;
+        targetHeadBobOffset.x = Mathf.Sin(headBobTimer / 2.0f) * headBobMagnitude;
+        targetHeadBobOffset.y = Mathf.Sin(headBobTimer) * headBobMagnitude;
 
         if (inputs.Player.Jump.WasPressedThisFrame())
         {
@@ -181,7 +183,10 @@ public class PlayerMovement : MonoBehaviour
 
         Camera.main.transform.eulerAngles = new Vector3(mouseLookEuler.x, mouseLookEuler.y, 0.0f);
         Camera.main.fieldOfView = Mathf.SmoothDamp(Camera.main.fieldOfView, targetFOV, ref FOVChangeVelocity, 0.15f);
+
+        currentHeadBobOffset = Vector3.SmoothDamp(currentHeadBobOffset, targetHeadBobOffset, ref headBobChangeVelo, 0.1f);
+
         cameraHeight = Mathf.SmoothDamp(cameraHeight, targetCameraHeight, ref cameraHeightChangeVelo, 0.1f);
-        Camera.main.transform.localPosition = Vector3.up * cameraHeight + headBobOffset;
+        Camera.main.transform.localPosition = Vector3.up * cameraHeight + currentHeadBobOffset;
     }
 }
