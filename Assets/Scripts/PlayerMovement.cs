@@ -32,6 +32,9 @@ public class PlayerMovement : MonoBehaviour
 
     private bool crouchActivated = false;
 
+    private float baseHeight = 2.0f;
+    private float crouchHeight = 1.4f;
+
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
@@ -56,7 +59,7 @@ public class PlayerMovement : MonoBehaviour
     {
         isGrounded = controller.isGrounded;
         sprintActivated = inputs.Player.Sprint.IsPressed();
-        crouchActivated = inputs.Player.Sprint.IsPressed();
+        crouchActivated = inputs.Player.Crouch.IsPressed();
 
         mouseLookDelta = inputs.Player.MouseLook.ReadValue<Vector2>();
         mouseLookVelocity = new Vector3(-mouseLookDelta.y, mouseLookDelta.x, 0.0f) * sensitivity;
@@ -75,6 +78,18 @@ public class PlayerMovement : MonoBehaviour
         {
             targetFOV = baseFOV;
             playerSpeed = baseSpeed;
+        }
+
+        if (crouchActivated)
+        {
+            controller.height = crouchHeight;
+            controller.center = Vector3.up * (crouchHeight / 2.0f);
+            Camera.main.transform.localPosition = Vector3.up * (crouchHeight - 0.5f);
+        } else
+        {
+            controller.height = baseHeight;
+            controller.center = Vector3.up * (baseHeight / 2.0f);
+            Camera.main.transform.localPosition = Vector3.up * (baseHeight - 0.5f);
         }
 
         movementVector = Quaternion.Euler(new Vector3(0.0f, mouseLookEuler.y, 0.0f)) * new Vector3(movementInput.x, 0.0f, movementInput.y) * playerSpeed;
