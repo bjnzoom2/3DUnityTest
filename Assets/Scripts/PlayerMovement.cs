@@ -1,12 +1,16 @@
 using UnityEngine;
 
-public enum SpecialMovementPlayerStates
+public enum PlayerMovementStates
+{
+    Grounded = 0,
+    Airborne = 1
+}
+
+public enum SpecialPlayerMovementStates
 {
     None = 0,
     Sprinting = 1,
-    Crouching = 2,
-    Sliding = 3
-
+    Crouching = 2
 }
 
 public class PlayerMovement : MonoBehaviour
@@ -14,7 +18,8 @@ public class PlayerMovement : MonoBehaviour
     private CharacterController controller;
     private GameInput inputs;
 
-    public SpecialMovementPlayerStates playerMovementState = new();
+    public PlayerMovementStates playerMovementState = new();
+    public SpecialPlayerMovementStates specialPlayerMovementState = new();
 
     private Vector2 movementInput;
     private Vector3 movementVector;
@@ -35,14 +40,10 @@ public class PlayerMovement : MonoBehaviour
 
     private float jumpPower = 8.0f;
 
-    private bool sprintActivated = false;
-
     private float baseFOV = 80.0f;
     private float sprintFOV = 110.0f;
     private float targetFOV = 80.0f;
     private float FOVChangeVelocity = 0.0f;
-
-    private bool crouchActivated = false;
 
     private float baseHeight = 2.0f;
     private float crouchHeight = 1.4f;
@@ -71,17 +72,23 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        isGrounded = controller.isGrounded;
+        if (controller.isGrounded)
+        {
+            playerMovementState = PlayerMovementStates.Grounded;
+        } else
+        {
+            playerMovementState = PlayerMovementStates.Airborne;
+        }
         
         if (inputs.Player.Sprint.IsPressed())
         {
-            playerMovementState = SpecialMovementPlayerStates.Sprinting;
+            specialPlayerMovementState = SpecialPlayerMovementStates.Sprinting;
         } else if (inputs.Player.Crouch.IsPressed())
         {
-            playerMovementState = SpecialMovementPlayerStates.Crouching;
+            specialPlayerMovementState = SpecialPlayerMovementStates.Crouching;
         } else
         {
-            playerMovementState = SpecialMovementPlayerStates.None;
+            specialPlayerMovementState = SpecialPlayerMovementStates.None;
         }
 
         mouseLookDelta = inputs.Player.MouseLook.ReadValue<Vector2>();
@@ -92,7 +99,7 @@ public class PlayerMovement : MonoBehaviour
 
         movementInput = inputs.Player.GroundMovement.ReadValue<Vector2>();
 
-        if (playerMovementState == SpecialMovementPlayerStates.Sprinting && movementInput.magnitude != 0.0f)
+        if (specialPlayerMovementState == SpecialPlayerMovementStates.Sprinting && movementInput.magnitude != 0.0f)
         {
             targetFOV = sprintFOV;
         }
@@ -101,7 +108,7 @@ public class PlayerMovement : MonoBehaviour
             targetFOV = baseFOV;
         }
 
-        if (playerMovementState == SpecialMovementPlayerStates.Crouching)
+        if (specialPlayerMovementState == SpecialPlayerMovementStates.Crouching)
         {
             controller.height = crouchHeight;
             controller.center = Vector3.up * (crouchHeight / 2.0f);
@@ -113,10 +120,10 @@ public class PlayerMovement : MonoBehaviour
             targetCameraHeight = baseHeight - 0.5f;
         }
 
-        if (playerMovementState == SpecialMovementPlayerStates.Crouching)
+        if (specialPlayerMovementState == SpecialPlayerMovementStates.Crouching)
         {
             playerSpeed = crouchSpeed;
-        } else if (playerMovementState == SpecialMovementPlayerStates.Sprinting)
+        } else if (specialPlayerMovementState == SpecialPlayerMovementStates.Sprinting)
         {
             playerSpeed = sprintSpeed;
         } else
@@ -128,13 +135,19 @@ public class PlayerMovement : MonoBehaviour
 
         if (inputs.Player.Jump.WasPressedThisFrame())
         {
-            if (isGrounded)
+            if (playerMovementState == PlayerMovementStates.Grounded)
             {
                 yVelocity = jumpPower;
+                playerMovementState = PlayerMovementStates.Airborne;
             }
         }
 
-        if (isGrounded && yVelocity <= 0.0f)
+        if (inputs.Player.Jump.WasReleasedThisFrame() && playerMovementState == PlayerMovementStates.Airborne && yVelocity > 0.0f)
+        {
+            yVelocity *= 0.6f;
+        }
+
+        if (playerMovementState == PlayerMovementStates.Grounded && yVelocity <= 0.0f)
         {
             yVelocity = -1.0f;
         }
