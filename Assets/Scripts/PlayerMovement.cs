@@ -1,9 +1,20 @@
 using UnityEngine;
 
+public enum SpecialMovementPlayerStates
+{
+    None = 0,
+    Sprinting = 1,
+    Crouching = 2,
+    Sliding = 3
+
+}
+
 public class PlayerMovement : MonoBehaviour
 {
     private CharacterController controller;
     private GameInput inputs;
+
+    public SpecialMovementPlayerStates playerMovementState = new();
 
     private Vector2 movementInput;
     private Vector3 movementVector;
@@ -11,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
     private float playerSpeed = 0.0f;
     private float sprintSpeed = 9.0f;
     private float baseSpeed = 4.5f;
+    private float crouchSpeed = 2.0f;
 
     private Vector2 mouseLookDelta;
     private Vector3 mouseLookVelocity;
@@ -60,8 +72,17 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         isGrounded = controller.isGrounded;
-        sprintActivated = inputs.Player.Sprint.IsPressed();
-        crouchActivated = inputs.Player.Crouch.IsPressed();
+        
+        if (inputs.Player.Sprint.IsPressed())
+        {
+            playerMovementState = SpecialMovementPlayerStates.Sprinting;
+        } else if (inputs.Player.Crouch.IsPressed())
+        {
+            playerMovementState = SpecialMovementPlayerStates.Crouching;
+        } else
+        {
+            playerMovementState = SpecialMovementPlayerStates.None;
+        }
 
         mouseLookDelta = inputs.Player.MouseLook.ReadValue<Vector2>();
         mouseLookVelocity = new Vector3(-mouseLookDelta.y, mouseLookDelta.x, 0.0f) * sensitivity;
@@ -71,18 +92,16 @@ public class PlayerMovement : MonoBehaviour
 
         movementInput = inputs.Player.GroundMovement.ReadValue<Vector2>();
 
-        if (sprintActivated && movementInput.magnitude != 0.0f)
+        if (playerMovementState == SpecialMovementPlayerStates.Sprinting && movementInput.magnitude != 0.0f)
         {
             targetFOV = sprintFOV;
-            playerSpeed = sprintSpeed;
         }
         else
         {
             targetFOV = baseFOV;
-            playerSpeed = baseSpeed;
         }
 
-        if (crouchActivated)
+        if (playerMovementState == SpecialMovementPlayerStates.Crouching)
         {
             controller.height = crouchHeight;
             controller.center = Vector3.up * (crouchHeight / 2.0f);
@@ -92,6 +111,17 @@ public class PlayerMovement : MonoBehaviour
             controller.height = baseHeight;
             controller.center = Vector3.up * (baseHeight / 2.0f);
             targetCameraHeight = baseHeight - 0.5f;
+        }
+
+        if (playerMovementState == SpecialMovementPlayerStates.Crouching)
+        {
+            playerSpeed = crouchSpeed;
+        } else if (playerMovementState == SpecialMovementPlayerStates.Sprinting)
+        {
+            playerSpeed = sprintSpeed;
+        } else
+        {
+            playerSpeed = baseSpeed;
         }
 
         movementVector = Quaternion.Euler(new Vector3(0.0f, mouseLookEuler.y, 0.0f)) * new Vector3(movementInput.x, 0.0f, movementInput.y) * playerSpeed;
