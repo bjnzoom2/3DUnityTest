@@ -25,8 +25,8 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 movementVector;
 
     private float playerSpeed = 0.0f;
-    private float sprintSpeed = 9.0f;
-    private float baseSpeed = 4.5f;
+    private float sprintSpeed = 7.5f;
+    private float baseSpeed = 4.0f;
     private float crouchSpeed = 2.0f;
 
     private Vector2 mouseLookDelta;
@@ -36,7 +36,6 @@ public class PlayerMovement : MonoBehaviour
 
     private float gravity = 14.0f;
     private float yVelocity = 0.0f;
-    private bool isGrounded = false;
 
     private float jumpPower = 8.0f;
 
@@ -48,7 +47,13 @@ public class PlayerMovement : MonoBehaviour
     private float baseHeight = 2.0f;
     private float crouchHeight = 1.4f;
     private float targetCameraHeight = 2.0f;
+    private float cameraHeight = 0.0f;
     private float cameraHeightChangeVelo = 0.0f;
+
+    private float headBobTimer = 0.0f;
+    private float headBobMagnitude = 0.05f;
+    private float headBobRate = 2.5f;
+    private Vector3 headBobOffset = new();
 
     private void Awake()
     {
@@ -68,6 +73,7 @@ public class PlayerMovement : MonoBehaviour
 
         playerSpeed = baseSpeed;
         Camera.main.fieldOfView = baseFOV;
+        cameraHeight = baseHeight - 0.5f;
     }
 
     private void Update()
@@ -123,15 +129,29 @@ public class PlayerMovement : MonoBehaviour
         if (specialPlayerMovementState == SpecialPlayerMovementStates.Crouching)
         {
             playerSpeed = crouchSpeed;
+            headBobMagnitude = 0.025f;
         } else if (specialPlayerMovementState == SpecialPlayerMovementStates.Sprinting)
         {
             playerSpeed = sprintSpeed;
+            headBobMagnitude = 0.07f;
         } else
         {
             playerSpeed = baseSpeed;
+            headBobMagnitude = 0.05f;
         }
 
         movementVector = Quaternion.Euler(new Vector3(0.0f, mouseLookEuler.y, 0.0f)) * new Vector3(movementInput.x, 0.0f, movementInput.y) * playerSpeed;
+
+        if (playerMovementState == PlayerMovementStates.Grounded && movementVector.magnitude != 0.0f)
+        {
+            headBobTimer += Time.deltaTime * playerSpeed * headBobRate;
+        } else
+        {
+            headBobTimer = 0.0f;
+        }
+
+        headBobOffset.x = Mathf.Sin(headBobTimer / 2.0f) * headBobMagnitude;
+        headBobOffset.y = Mathf.Sin(headBobTimer) * headBobMagnitude;
 
         if (inputs.Player.Jump.WasPressedThisFrame())
         {
@@ -161,6 +181,7 @@ public class PlayerMovement : MonoBehaviour
 
         Camera.main.transform.eulerAngles = new Vector3(mouseLookEuler.x, mouseLookEuler.y, 0.0f);
         Camera.main.fieldOfView = Mathf.SmoothDamp(Camera.main.fieldOfView, targetFOV, ref FOVChangeVelocity, 0.15f);
-        Camera.main.transform.localPosition = Vector3.up * Mathf.SmoothDamp(Camera.main.transform.localPosition.y, targetCameraHeight, ref cameraHeightChangeVelo, 0.1f);
+        cameraHeight = Mathf.SmoothDamp(cameraHeight, targetCameraHeight, ref cameraHeightChangeVelo, 0.1f);
+        Camera.main.transform.localPosition = Vector3.up * cameraHeight + headBobOffset;
     }
 }
