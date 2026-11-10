@@ -34,6 +34,8 @@ public class PlayerMovement : MonoBehaviour
 
     private float baseHeight = 2.0f;
     private float crouchHeight = 1.4f;
+    private float targetCameraHeight = 2.0f;
+    private float cameraHeightChangeVelo = 0.0f;
 
     private void Awake()
     {
@@ -84,12 +86,12 @@ public class PlayerMovement : MonoBehaviour
         {
             controller.height = crouchHeight;
             controller.center = Vector3.up * (crouchHeight / 2.0f);
-            Camera.main.transform.localPosition = Vector3.up * (crouchHeight - 0.5f);
+            targetCameraHeight = crouchHeight - 0.3f;
         } else
         {
             controller.height = baseHeight;
             controller.center = Vector3.up * (baseHeight / 2.0f);
-            Camera.main.transform.localPosition = Vector3.up * (baseHeight - 0.5f);
+            targetCameraHeight = baseHeight - 0.5f;
         }
 
         movementVector = Quaternion.Euler(new Vector3(0.0f, mouseLookEuler.y, 0.0f)) * new Vector3(movementInput.x, 0.0f, movementInput.y) * playerSpeed;
@@ -113,7 +115,9 @@ public class PlayerMovement : MonoBehaviour
 
         controller.Move((movementVector + Vector3.up * yVelocity) * Time.deltaTime);
         transform.eulerAngles = new Vector3(0.0f, mouseLookEuler.y, 0.0f);
+
         Camera.main.transform.eulerAngles = new Vector3(mouseLookEuler.x, mouseLookEuler.y, 0.0f);
         Camera.main.fieldOfView = Mathf.SmoothDamp(Camera.main.fieldOfView, targetFOV, ref FOVChangeVelocity, 0.15f);
+        Camera.main.transform.localPosition = Vector3.up * Mathf.SmoothDamp(Camera.main.transform.localPosition.y, targetCameraHeight, ref cameraHeightChangeVelo, 0.1f);
     }
 }
