@@ -58,6 +58,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 headBobChangeVelo = new();
 
     private float interactionRayDistance = 2.0f;
+    private IInteractable interactable = null;
 
     private void Awake()
     {
@@ -198,10 +199,21 @@ public class PlayerMovement : MonoBehaviour
     {
         bool hit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hitResults, interactionRayDistance);
 
-        if (hit && inputs.Player.Interact.WasPressedThisFrame())
+        if (interactable == null)
         {
-            hitResults.collider.gameObject.TryGetComponent(out IInteractable interactable);
-            interactable.InteractAction();
+            if (hit && inputs.Player.Interact.WasPressedThisFrame())
+            {
+                hitResults.collider.gameObject.TryGetComponent(out IInteractable _interactable);
+                interactable = _interactable;
+                interactable.InteractAction(gameObject);
+            }
+        } else
+        {
+            if (inputs.Player.Interact.WasPressedThisFrame())
+            {
+                interactable.InteractAction(gameObject);
+                interactable = null;
+            }
         }
     }
 }
