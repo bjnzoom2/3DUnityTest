@@ -57,22 +57,15 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 targetHeadBobOffset = new();
     private Vector3 headBobChangeVelo = new();
 
-    private float interactionRayDistance = 2.0f;
-    private IInteractable interactable = null;
-
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
-        inputs = new();
-    }
-
-    private void OnEnable()
-    {
-        inputs.Enable();
     }
 
     private void Start()
     {
+        inputs = gameObject.GetComponent<Player>().inputs;
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -181,8 +174,6 @@ public class PlayerMovement : MonoBehaviour
             yVelocity -= gravity * Time.deltaTime;
         }
 
-        InteractionRay();
-
         controller.Move((movementVector + Vector3.up * yVelocity) * Time.deltaTime);
         transform.eulerAngles = new Vector3(0.0f, mouseLookEuler.y, 0.0f);
 
@@ -193,27 +184,5 @@ public class PlayerMovement : MonoBehaviour
 
         cameraHeight = Mathf.SmoothDamp(cameraHeight, targetCameraHeight, ref cameraHeightChangeVelo, 0.1f);
         Camera.main.transform.localPosition = Vector3.up * cameraHeight + currentHeadBobOffset;
-    }
-
-    private void InteractionRay()
-    {
-        bool hit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hitResults, interactionRayDistance);
-
-        if (interactable == null)
-        {
-            if (hit && inputs.Player.Interact.WasPressedThisFrame())
-            {
-                hitResults.collider.gameObject.TryGetComponent(out IInteractable _interactable);
-                interactable = _interactable;
-                interactable.InteractAction(gameObject);
-            }
-        } else
-        {
-            if (inputs.Player.Interact.WasPressedThisFrame())
-            {
-                interactable.InteractAction(gameObject);
-                interactable = null;
-            }
-        }
     }
 }
