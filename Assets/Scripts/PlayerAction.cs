@@ -24,11 +24,18 @@ public class PlayerAction : MonoBehaviour
 
         if (interactable == null)
         {
-            if (hit && inputs.Player.Interact.WasPressedThisFrame())
+            if (hit)
             {
                 hitInteractable = hitResults.collider.gameObject.TryGetComponent(out IInteractable _interactable);
-                interactable = _interactable;
-                interactable.InteractAction(gameObject);
+
+                if (inputs.Player.Interact.WasPressedThisFrame())
+                {
+                    interactable = _interactable;
+                    interactable.InteractAction(gameObject);
+                }
+            } else
+            {
+                hitInteractable = false;
             }
         }
         else
