@@ -5,7 +5,7 @@ interface IInteractable
     public void InteractAction(GameObject interacter);
 }
 
-public class Block : MonoBehaviour, IInteractable
+public class Pickup : MonoBehaviour, IInteractable
 {
     private Vector3 targetPosition = new();
     private Rigidbody rigidbody;
@@ -35,7 +35,8 @@ public class Block : MonoBehaviour, IInteractable
             interacter = _interacter;
             targetDistance = Vector3.Distance(transform.position, Camera.main.transform.position);
             rigidbody.useGravity = false;
-        } else
+        }
+        else
         {
             interacter = null;
             targetDistance = 0.0f;
