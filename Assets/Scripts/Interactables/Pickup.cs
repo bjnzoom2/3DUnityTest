@@ -2,7 +2,15 @@ using UnityEngine;
 
 interface IInteractable
 {
-    public void InteractAction(GameObject interacter);
+    public bool Toggle
+    {
+        get;
+    }
+
+    public virtual void InteractAction(GameObject _interacter)
+    {
+        Debug.Log("Interacted");
+    }
 }
 
 public class Pickup : MonoBehaviour, IInteractable
@@ -13,9 +21,15 @@ public class Pickup : MonoBehaviour, IInteractable
     private bool pickedUp = false;
     private float targetDistance = 0.0f;
 
+    public bool Toggle
+    {
+        get; private set;
+    }
+
     private void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
+        Toggle = true;
     }
 
     private void FixedUpdate()
