@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -47,6 +48,8 @@ public class UIHandler : MonoBehaviour
 
     private void DisplayDialogue(string _text, Sprite _image, bool _continuous, bool _endedDialogue)
     {
+        dialogueText.maxVisibleCharacters = 0;
+
         if (!_continuous)
         {
             dialoguePanel.SetActive(!displayingDialogue);
@@ -54,6 +57,7 @@ public class UIHandler : MonoBehaviour
             {
                 dialogueText.text = _text;
                 dialogueImage.sprite = (_image != null) ? _image : null;
+                StartCoroutine(TextIncrement(_text));
             }
 
             displayingDialogue = !displayingDialogue;
@@ -62,6 +66,7 @@ public class UIHandler : MonoBehaviour
             if (!_endedDialogue)
             {
                 dialoguePanel.SetActive(true);
+                StartCoroutine(TextIncrement(_text));
                 dialogueText.text = _text;
                 dialogueImage.sprite = (_image != null) ? _image : null;
             } else
@@ -71,10 +76,20 @@ public class UIHandler : MonoBehaviour
                 {
                     dialogueText.text = _text;
                     dialogueImage.sprite = (_image != null) ? _image : null;
+                    StartCoroutine(TextIncrement(_text));
                 }
 
                 displayingDialogue = !displayingDialogue;
             }
+        }
+    }
+
+    private IEnumerator TextIncrement(string _text)
+    {
+        while (dialogueText.maxVisibleCharacters < _text.Length)
+        {
+            dialogueText.maxVisibleCharacters++;
+            yield return new WaitForSeconds(0.03f);
         }
     }
 }
