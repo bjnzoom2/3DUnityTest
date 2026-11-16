@@ -1,18 +1,5 @@
 using UnityEngine;
 
-interface IInteractable
-{
-    public bool Toggle
-    {
-        get;
-    }
-
-    public virtual void InteractAction(GameObject _interacter)
-    {
-        Debug.Log("Interacted");
-    }
-}
-
 public class Pickup : MonoBehaviour, IInteractable
 {
     private Vector3 targetPosition = new();
@@ -38,7 +25,7 @@ public class Pickup : MonoBehaviour, IInteractable
         {
             targetPosition = Camera.main.transform.position + Camera.main.transform.forward * targetDistance;
             Vector3 displacement = targetPosition - rigidbody.position;
-            rigidbody.linearVelocity = displacement * 10.0f;
+            rigidbody.linearVelocity = displacement * 12.0f;
         }
     }
 
