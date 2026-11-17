@@ -14,9 +14,15 @@ public class UIHandler : MonoBehaviour
     private PlayerAction actions;
 
     [SerializeField] private GameObject dialoguePanel;
+    private RectTransform dialogueRect;
     [SerializeField] private Image dialogueImage;
     [SerializeField] private TextMeshProUGUI dialogueText;
     private bool displayingDialogue = false;
+
+    private Vector2 targetDialoguePos = new();
+    private Vector2 baseDialoguePos = new();
+    private Vector2 hiddenDialoguePos = new();
+    private Vector2 dialogueVelo = new();
 
     private void OnEnable()
     {
@@ -26,6 +32,16 @@ public class UIHandler : MonoBehaviour
     private void OnDisable()
     {
         DialogueInteract.DisplayDialogueString -= DisplayDialogue;
+    }
+
+    private void Awake()
+    {
+        dialogueRect = dialoguePanel.GetComponent<RectTransform>();
+
+        baseDialoguePos = dialogueRect.anchoredPosition;
+        hiddenDialoguePos = new(0.0f, -1080.0f);
+        targetDialoguePos = hiddenDialoguePos;
+        dialogueRect.anchoredPosition = hiddenDialoguePos;
     }
 
     private void Start()
@@ -44,6 +60,8 @@ public class UIHandler : MonoBehaviour
         }
 
         interactText.alpha = (actions.hitInteractable) ? 1.0f : 0.0f;
+
+        dialogueRect.anchoredPosition = Vector2.SmoothDamp(dialogueRect.anchoredPosition, targetDialoguePos, ref dialogueVelo, 0.2f);
     }
 
     private void DisplayDialogue(string _text, Sprite _image, bool _continuous, bool _endedDialogue)
@@ -52,31 +70,40 @@ public class UIHandler : MonoBehaviour
 
         if (!_continuous)
         {
-            dialoguePanel.SetActive(!displayingDialogue);
             if (!displayingDialogue)
             {
                 dialogueText.text = _text;
                 dialogueImage.sprite = (_image != null) ? _image : null;
                 StartCoroutine(TextIncrement(_text));
-            }
 
+                targetDialoguePos = baseDialoguePos;
+            } else
+            {
+                targetDialoguePos = hiddenDialoguePos;
+            }
+            
             displayingDialogue = !displayingDialogue;
         } else
         {
             if (!_endedDialogue)
             {
-                dialoguePanel.SetActive(true);
-                StartCoroutine(TextIncrement(_text));
                 dialogueText.text = _text;
+                StartCoroutine(TextIncrement(_text));
                 dialogueImage.sprite = (_image != null) ? _image : null;
+
+                targetDialoguePos = baseDialoguePos;
             } else
             {
-                dialoguePanel.SetActive(displayingDialogue);
                 if (displayingDialogue)
                 {
                     dialogueText.text = _text;
                     dialogueImage.sprite = (_image != null) ? _image : null;
                     StartCoroutine(TextIncrement(_text));
+
+                    targetDialoguePos = baseDialoguePos;
+                } else
+                {
+                    targetDialoguePos = hiddenDialoguePos;
                 }
 
                 displayingDialogue = !displayingDialogue;
@@ -86,6 +113,8 @@ public class UIHandler : MonoBehaviour
 
     private IEnumerator TextIncrement(string _text)
     {
+        yield return new WaitForSeconds(0.2f);
+
         while (dialogueText.maxVisibleCharacters < _text.Length)
         {
             dialogueText.maxVisibleCharacters++;
