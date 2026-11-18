@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Door : MonoBehaviour, IInteractable
 {
-    private Transform pivotPoint;
+    private Transform doorMesh;
 
     private bool isOpened = false;
 
@@ -21,20 +21,20 @@ public class Door : MonoBehaviour, IInteractable
 
     private void Awake()
     {
-        pivotPoint = transform.Find("Pivot");
+        doorMesh = transform.Find("DoorFrame/DoorMesh");
         Toggle = false;
         InteractText = closedText;
     }
 
     private void Start()
     {
-        currentAngle = pivotPoint.transform.eulerAngles.y;
+        currentAngle = doorMesh.transform.localEulerAngles.y;
     }
 
     private void Update()
     {
         currentAngle = Mathf.SmoothDampAngle(currentAngle, targetAngle, ref rotateVelo, 0.2f);
-        pivotPoint.transform.eulerAngles = new(0.0f, currentAngle, 0.0f);
+        doorMesh.transform.localEulerAngles = new(0.0f, currentAngle, 0.0f);
     }
 
     public void InteractAction(GameObject _interacter)

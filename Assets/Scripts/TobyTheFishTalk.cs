@@ -10,8 +10,8 @@ public class TobyTheFishTalk : DialogueInteract
         dialogueLines = new List<string>
         {
             "Hello I am test guy",
-            "Brr brr patapim",
-            "Tung"
+            "Check out the toby the fish tiktok",
+            "Type shi"
         };
     }
 }
