@@ -5,6 +5,7 @@ using System;
 public abstract class DialogueInteract : MonoBehaviour, IInteractable
 {
     public bool Toggle => false;
+    public virtual string InteractText { get; set; } = "E to Talk";
     protected List<string> dialogueLines = new();
     protected int index = 0;
     [SerializeField] protected Sprite dialogueImage;

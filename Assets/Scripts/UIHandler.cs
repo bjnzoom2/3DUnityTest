@@ -60,6 +60,7 @@ public class UIHandler : MonoBehaviour
         }
 
         interactText.alpha = (actions.hitInteractable) ? 1.0f : 0.0f;
+        interactText.text = actions.interactText;
 
         dialogueRect.anchoredPosition = Vector2.SmoothDamp(dialogueRect.anchoredPosition, targetDialoguePos, ref dialogueVelo, 0.2f);
     }

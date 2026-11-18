@@ -7,6 +7,7 @@ public class PlayerAction : MonoBehaviour
     private GameInput inputs;
     private float interactionRayDistance = 2.0f;
     public bool hitInteractable = false;
+    public string interactText = null;
     private IInteractable interactable = null;
     private bool interactToggle = false;
 
@@ -33,6 +34,7 @@ public class PlayerAction : MonoBehaviour
             if (hitInteractable)
             {
                 interactToggle = _interactable.Toggle;
+                interactText = _interactable.InteractText;
             }
         } else
         {

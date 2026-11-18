@@ -13,10 +13,16 @@ public class Pickup : MonoBehaviour, IInteractable
         get; private set;
     }
 
+    public string InteractText
+    {
+        get; set;
+    }
+
     private void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
         Toggle = true;
+        InteractText = "E to Grab";
     }
 
     private void FixedUpdate()

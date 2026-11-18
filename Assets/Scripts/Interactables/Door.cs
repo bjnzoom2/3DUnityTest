@@ -15,10 +15,15 @@ public class Door : MonoBehaviour, IInteractable
         get; private set;
     }
 
+    public string InteractText { get; set; }
+    private string closedText = "E to Open";
+    private string openedText = "E to Close";
+
     private void Awake()
     {
         pivotPoint = transform.Find("Pivot");
         Toggle = false;
+        InteractText = closedText;
     }
 
     private void Start()
@@ -37,9 +42,11 @@ public class Door : MonoBehaviour, IInteractable
         if (!isOpened)
         {
             targetAngle = -90.0f;
+            InteractText = openedText;
         } else
         {
             targetAngle = 0.0f;
+            InteractText = closedText;
         }
 
         isOpened = !isOpened;
