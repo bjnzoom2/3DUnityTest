@@ -7,6 +7,8 @@ public class Pickup : MonoBehaviour, IInteractable
     private GameObject interacter;
     private bool pickedUp = false;
     private float targetDistance = 0.0f;
+    private float baseAngularDamping;
+    private float grabbedAngularDamping = 0.8f;
 
     public bool Toggle
     {
@@ -21,6 +23,7 @@ public class Pickup : MonoBehaviour, IInteractable
     private void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
+        baseAngularDamping = rigidbody.angularDamping;
         Toggle = true;
         InteractText = "E to Grab";
     }
@@ -42,12 +45,14 @@ public class Pickup : MonoBehaviour, IInteractable
             interacter = _interacter;
             targetDistance = Vector3.Distance(transform.position, Camera.main.transform.position);
             rigidbody.useGravity = false;
+            rigidbody.angularDamping = grabbedAngularDamping;
         }
         else
         {
             interacter = null;
             targetDistance = 0.0f;
             rigidbody.useGravity = true;
+            rigidbody.angularDamping = baseAngularDamping;
         }
 
         pickedUp = !pickedUp;
